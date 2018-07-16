@@ -13,15 +13,19 @@ def test_variable_domain_iteration():
     assert domain == domain_of_variable
 
 
-def test_variable_enumerated_iteration():
-    domain = list(range(9, 0, -1))
-    variable = Variable(domain)
-
+def verify_domain_consistency(variable, domain):
     j = 0
     for i, v in variable.enumerate():
         assert i == j
         assert v == domain[i]
         j += 1
+
+
+def test_variable_enumerated_iteration():
+    domain = list(range(9, 0, -1))
+    variable = Variable(domain)
+
+    verify_domain_consistency(variable, domain)
 
 
 def test_variable_pruned_iteration():
@@ -54,3 +58,13 @@ def test_variable_pruned_index_iteration():
     assert [d for d in domain if d != 5] == domain_of_variable
     variable.prune_at_index(5, unprune=True)
     assert len(domain) == variable.domain_size()
+
+
+def test_variable_add_value():
+    variable = Variable()
+    domain = "abcdefghijklmn"
+    for c in domain:
+        variable.add_value(c)
+
+    assert len(domain) == variable.domain_size()
+    verify_domain_consistency(variable, domain)
