@@ -8,6 +8,19 @@ Install in editable mode with `py -3 -m pip install -e .` so that
 modifications in the repository are automatically synced with the
 installed library.
 
+# Testing
+Install dependencies
+
+`py -3 -m pip install tox pytest coverage pytest-cov`
+
+Run pytest at top level directly independently
+
+`py -m pytest -s -v --log-cli-level=DEBUG --show-capture=no`
+
+Run tox from any directory to run tests in a virtual environment and tests coverage.
+
+`tox`
+
 # Organization
 Everything is under the `cp_solver` package.
 

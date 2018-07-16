@@ -1,4 +1,7 @@
 .idea
+.coverage
+.tox
+.pytest_cache
 **/venv/**
 *.pyc
-*.egg_info
+*.egg-info/
