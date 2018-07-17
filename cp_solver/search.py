@@ -69,8 +69,9 @@ class BacktrackSearch:
             return None
         return self._solution
 
-    def _recurse(self):
+    def _recurse(self, level=0):
         """Return whether we had a domain wipeout"""
+        logging_indent = " " * level
 
         var, var_i = self._get_next_var(self._csp)
 
@@ -78,14 +79,17 @@ class BacktrackSearch:
         if var is None:
             # reached a solution
             self._solution = [v.assigned_value() for v in self._csp.variables()]
+            logger.debug("Reached solution {}".format(self._solution))
             return base.DomainWipeout.NO_DWO
 
+        logger.debug("{}Find a value for {}".format(logging_indent, var_i))
         for val in self._get_next_val(self._csp, var_i):
             var.assign(val)
             domain_wipeout, prunings = self._propagator(self._csp, var)
 
+            logger.debug("{}Assigning {} to {} -> {}".format(logging_indent, val, var_i, domain_wipeout))
             if not domain_wipeout:
-                return self._recurse()
+                return self._recurse(level + 1)
 
             # else this choice of val for var caused a domain wipeout so we need to restore and try something else
             self._restore_pruning(prunings)
