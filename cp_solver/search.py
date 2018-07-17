@@ -39,13 +39,13 @@ class BacktrackSearch:
         self._get_next_val = select_next_value
         self._solution = None
 
-    def restore_all_domains(self):
+    def _restore_all_domains(self):
         for v in self._csp.variables():
             if v.is_assigned():
                 v.unassign()
             v.restore_domain()
 
-    def restore_pruning(self, prunings: typing.List[typing.Tuple[Variable, typing.Any]]):
+    def _restore_pruning(self, prunings: typing.List[typing.Tuple[Variable, typing.Any]]):
         for var, val in prunings:
             # TODO consider if we can store value indices instead since that'll be an order of magnitude improvement
             var.prune(val, unprune=True)
@@ -53,7 +53,7 @@ class BacktrackSearch:
     def search(self):
         """Get first solution to CSP. Returns None if no solution, otherwise the solution."""
 
-        self.restore_all_domains()
+        self._restore_all_domains()
 
         # initial propagation
         domain_wipeout, prunings = self._propagator(self._csp)
@@ -61,15 +61,15 @@ class BacktrackSearch:
         if domain_wipeout:
             return None
 
-        domain_wipeout = self.recurse()
+        domain_wipeout = self._recurse()
 
-        self.restore_pruning(prunings)
+        self._restore_pruning(prunings)
 
         if domain_wipeout:
             return None
         return self._solution
 
-    def recurse(self):
+    def _recurse(self):
         """Return whether we had a domain wipeout"""
 
         var, var_i = self._get_next_var(self._csp)
@@ -85,10 +85,10 @@ class BacktrackSearch:
             domain_wipeout, prunings = self._propagator(self._csp, var)
 
             if not domain_wipeout:
-                return self.recurse()
+                return self._recurse()
 
             # else this choice of val for var caused a domain wipeout so we need to restore and try something else
-            self.restore_pruning(prunings)
+            self._restore_pruning(prunings)
             var.unassign()
 
         # if there was no choice for any var to not have domain wipeout, our previous choices forced us to wipeout
