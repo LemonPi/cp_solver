@@ -22,3 +22,12 @@ def test_queens():
     for n in range(4, 14):
         solution = queens.solve(n, prop=prop)
         verify_queens_solution(solution)
+
+
+@pytest.mark.timeout(10)
+def test_queens_fc():
+    prop = propagator.ForwardCheck()
+
+    for n in range(4, 30):
+        solution = queens.solve(n, prop=prop)
+        verify_queens_solution(solution)
