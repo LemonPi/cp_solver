@@ -3,7 +3,7 @@ from cp_solver import search
 from cp_solver import propagator
 
 
-def solve(size):
+def solve(size, prop=propagator.ForwardCheck()):
     rows = list(range(size))
     cols = [base.Variable(rows) for _ in range(size)]
     csp = base.CSP(cols)
@@ -16,5 +16,5 @@ def solve(size):
             # downward diagonal
             csp.add_constraint(base.FunctionConstraint([cols[i], cols[j]], lambda a, b, i=i, j=j: a != b - (j - i)))
 
-    bt = search.BacktrackSearch(csp)
+    bt = search.BacktrackSearch(csp, prop=prop)
     return bt.search()
