@@ -54,5 +54,6 @@ setup(name='cp_solver',
       ],
       tests_require=[
           'pytest',
+          'pytest-timeout'
       ],
       )

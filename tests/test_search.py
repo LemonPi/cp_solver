@@ -1,11 +1,10 @@
 from examples import queens
 from cp_solver import propagator
+import pytest
 
 
-def test_queens():
-    solution = queens.solve(8, prop=propagator.NoPropagation())
+def verify_queens_solution(solution):
     assert solution is not None
-    queens.print_solution(solution, 8)
 
     for col in range(len(solution)):
         for col2 in range(len(solution)):
@@ -14,3 +13,12 @@ def test_queens():
             assert solution[col] != solution[col2]
             assert solution[col] != solution[col2] + (col2 - col)
             assert solution[col] != solution[col2] - (col2 - col)
+
+
+@pytest.mark.timeout(10)
+def test_queens():
+    prop = propagator.NoPropagation()
+
+    for n in range(4, 14):
+        solution = queens.solve(n, prop=prop)
+        verify_queens_solution(solution)
