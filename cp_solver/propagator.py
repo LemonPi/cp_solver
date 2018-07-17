@@ -10,6 +10,17 @@ class Propagator(abc.ABC):
         """Prunes csp's variables and returns (domain wipeout, [(pruned variable, pruned value), ...])"""
 
 
+class NoPropagation(Propagator):
+    def __call__(self, csp: CSP, newly_instantiated_variable=None):
+        if not newly_instantiated_variable:
+            return False, []
+        for c in csp.constraints_involving_variable(newly_instantiated_variable):
+            if not c.unassigned():
+                if not c.check_feasible():
+                    return True, []
+        return False, []
+
+
 class ForwardCheck(Propagator):
     def __call__(self, csp: CSP, newly_instantiated_variable=None):
         total_pruned = []
