@@ -89,7 +89,9 @@ class BacktrackSearch:
 
             logger.debug("{}Assigning {} to {} -> {}".format(logging_indent, val, var_i, domain_wipeout))
             if not domain_wipeout:
-                return self._recurse(level + 1)
+                domain_wipeout = self._recurse(level + 1)
+                if domain_wipeout != base.DomainWipeout.DWO:
+                    return domain_wipeout
 
             # else this choice of val for var caused a domain wipeout so we need to restore and try something else
             self._restore_pruning(prunings)

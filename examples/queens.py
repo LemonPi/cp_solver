@@ -18,3 +18,18 @@ def solve(size, prop=propagator.ForwardCheck()):
 
     bt = search.BacktrackSearch(csp, prop=prop)
     return bt.search()
+
+
+def print_solution(solution, size):
+    print("   %s \n" % ("-" * ((size * 4) - 1)), end='')
+    for i in range(size):
+        print("  |", end='')
+        for j in range(size):
+            if solution[j] == i:
+                print(" %d |" % j, end='')
+            else:
+                print("   |", end='')
+        print("\n", end='')
+        if i != size - 1:
+            print("  |%s|\n" % ("-" * ((size * 4) - 1)), end='')
+    print("   %s \n" % ("-" * ((size * 4) - 1)), end='')
