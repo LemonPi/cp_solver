@@ -3,6 +3,7 @@ from cp_solver import propagator
 import logging
 import typing
 import math
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,7 @@ class BacktrackSearch:
 
     def search(self):
         """Get first solution to CSP. Returns None if no solution, otherwise the solution."""
+        start_time = time.time()
 
         self._restore_all_domains()
 
@@ -65,6 +67,7 @@ class BacktrackSearch:
 
         self._restore_pruning(prunings)
 
+        logger.info("Search took {} seconds".format(time.time() - start_time))
         if domain_wipeout == base.DomainWipeout.DWO:
             return None
         return self._solution
