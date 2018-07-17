@@ -191,7 +191,7 @@ class FunctionConstraint(Constraint):
         self._func = call_able
 
     def test(self, values):
-        return self._func(values)
+        return self._func(*values)
 
 
 class DifferentConstraint(Constraint):
