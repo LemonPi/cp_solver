@@ -73,39 +73,50 @@ class Variable:
         if self._assigned_value is not None:
             return iter([self._assigned_value])
 
-        self._current_iter = 0
-        return self
+        return DomainIterator(self._values, self._visible_values)
 
     def enumerate(self):
-        return VariableEnumerator(self)
+        if self._assigned_value is not None:
+            return iter([(self._values.index(self._assigned_value), self._assigned_value)])
+
+        return DomainEnumerator(self._values, self._visible_values)
+
+
+class DomainIterator:
+    def __init__(self, domain, visible):
+        # assume the domain doesn't change; if it's possible to change, this should be copied as well
+        self._domain = domain
+        # this is a copy so any nested pruning doesn't affect outer iteration
+        self._visible = tuple(visible)
+
+        self._current_iter = 0
+        self._max_length = len(domain)
+
+    def __iter__(self):
+        return self
 
     def __next__(self):
-        max_length = len(self._values)
-        # this iteration makes it safe to prune current value as we iterate
-        while self._current_iter < max_length and not self._visible_values[self._current_iter]:
+        while self._current_iter < self._max_length and not self._visible[self._current_iter]:
             self._current_iter += 1
 
-        if self._current_iter >= max_length:
+        if self._current_iter >= self._max_length:
             raise StopIteration
 
         self._current_iter += 1
-        return self._values[self._current_iter - 1]
+        return self._domain[self._current_iter - 1]
 
 
-class VariableEnumerator:
-    def __init__(self, variable: Variable):
-        self._v = variable
-
-    def __iter__(self):
-        if self._v._assigned_value is not None:
-            return iter([(self._v._values.index(self._v._assigned_value), self._v._assigned_value)])
-
-        self._v._current_iter = 0
-        return self
-
+class DomainEnumerator(DomainIterator):
     def __next__(self):
-        val = next(self._v)
-        return self._v._current_iter - 1, val
+        while self._current_iter < self._max_length and not self._visible[self._current_iter]:
+            self._current_iter += 1
+
+        if self._current_iter >= self._max_length:
+            raise StopIteration
+
+        i = self._current_iter
+        self._current_iter += 1
+        return i, self._domain[i]
 
 
 class Constraint(abc.ABC):

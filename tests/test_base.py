@@ -1,4 +1,5 @@
 from cp_solver.base import Variable
+import itertools
 
 
 def test_variable_domain_iteration():
@@ -26,6 +27,21 @@ def test_variable_enumerated_iteration():
     variable = Variable(domain)
 
     verify_domain_consistency(variable, domain)
+
+
+def test_nested_iteration():
+    # should go through all value combinations
+    domain = list(range(10))
+    variable = Variable(domain)
+
+    value_combos = set()
+    for v in variable:
+        for vv in variable:
+            value_combos.add((v, vv))
+
+    should_produce = set(itertools.product(domain, domain))
+
+    assert value_combos == should_produce
 
 
 def test_variable_pruned_iteration():
