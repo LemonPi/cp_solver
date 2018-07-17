@@ -180,11 +180,11 @@ class Constraint(abc.ABC):
         uv = values.index(None)
 
         # check all values of this variable
-        for val in unassigned_variable:
+        for val_i, val in unassigned_variable.enumerate():
             values[uv] = val
             if not self.test(values):
-                unassigned_variable.prune(val)
-                pruned.append((unassigned_variable, val))
+                unassigned_variable.prune_at_index(val_i)
+                pruned.append((unassigned_variable, val_i))
 
         domain_wipeout = DomainWipeout.DWO if unassigned_variable.domain_size() == 0 else DomainWipeout.NO_DWO
         return domain_wipeout, pruned

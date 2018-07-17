@@ -52,10 +52,9 @@ class BacktrackSearch:
                 v.unassign()
             v.restore_domain()
 
-    def _restore_pruning(self, prunings: typing.List[typing.Tuple[base.Variable, typing.Any]]):
-        for var, val in prunings:
-            # TODO consider if we can store value indices instead since that'll be an order of magnitude improvement
-            var.prune(val, unprune=True)
+    def _restore_pruning(self, prunings: typing.List[typing.Tuple[base.Variable, int]]):
+        for var, val_i in prunings:
+            var.prune_at_index(val_i, unprune=True)
 
     def search(self):
         """Get first solution to CSP. Returns None if no solution, otherwise the solution."""
