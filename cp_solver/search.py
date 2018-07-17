@@ -8,15 +8,21 @@ import time
 logger = logging.getLogger(__name__)
 
 
-def get_min_domain_variable(csp):
+def get_min_domain_max_constraint(csp):
     # by default use the fail-first principle and return the variable with the smallest domain
     min_domain = math.inf
+    max_cons = 0
     chosen_i = None
     vars = csp.variables()
     for i in range(len(vars)):
         v = vars[i]
-        if not v.is_assigned() and v.domain_size() < min_domain:
+        if v.is_assigned():
+            continue
+
+        num_cons = len(csp.constraints_involving_variable(v))
+        if v.domain_size() < min_domain or (v.domain_size() == min_domain and num_cons > max_cons):
             min_domain = v.domain_size()
+            max_cons = num_cons
             chosen_i = i
 
     return (vars[chosen_i], chosen_i) if chosen_i is not None else (None, None)
@@ -31,7 +37,7 @@ def get_value_in_domain_order(csp, var_i):
 class BacktrackSearch:
     def __init__(self, csp: base.CSP, prop=propagator.ForwardCheck(),
                  select_next_variable: typing.Callable[
-                     [base.CSP], typing.Tuple[base.Variable, int]] = get_min_domain_variable,
+                     [base.CSP], typing.Tuple[base.Variable, int]] = get_min_domain_max_constraint,
                  select_next_value: typing.Callable[[base.CSP, int], typing.Any] = get_value_in_domain_order):
 
         self._csp = csp
