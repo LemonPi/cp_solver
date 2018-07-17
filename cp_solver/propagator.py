@@ -1,5 +1,6 @@
 import abc
 from cp_solver.base import CSP
+from cp_solver.base import DomainWipeout
 
 
 class Propagator(abc.ABC):
@@ -13,12 +14,12 @@ class Propagator(abc.ABC):
 class NoPropagation(Propagator):
     def __call__(self, csp: CSP, newly_instantiated_variable=None):
         if not newly_instantiated_variable:
-            return False, []
+            return DomainWipeout.NO_DWO, []
         for c in csp.constraints_involving_variable(newly_instantiated_variable):
             if not c.unassigned():
                 if not c.check_feasible():
-                    return True, []
-        return False, []
+                    return DomainWipeout.DWO, []
+        return DomainWipeout.NO_DWO, []
 
 
 class ForwardCheck(Propagator):
@@ -29,9 +30,9 @@ class ForwardCheck(Propagator):
             total_pruned.extend(pruned)
 
             if domain_wipeout:
-                return domain_wipeout, total_pruned
+                return DomainWipeout.DWO, total_pruned
 
-        return False, total_pruned
+        return DomainWipeout.NO_DWO, total_pruned
 
 
 class GeneralArcConsistency(Propagator):

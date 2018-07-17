@@ -1,6 +1,7 @@
 import typing
 import abc
 import itertools
+import enum
 
 
 class Variable:
@@ -119,6 +120,11 @@ class DomainEnumerator(DomainIterator):
         return i, self._domain[i]
 
 
+class DomainWipeout(enum.IntEnum):
+    NO_DWO = 0
+    DWO = 1
+
+
 class Constraint(abc.ABC):
     """A constraint in a constraint satisfaction problem.
 
@@ -164,11 +170,10 @@ class Constraint(abc.ABC):
     def forward_check(self):
         pruned = []
 
-        domain_wipeout = False
         # forward checking is only for if there's only one unassigned variable
         ua = self.unassigned()
         if len(ua) != 1:
-            return domain_wipeout, pruned
+            return DomainWipeout.NO_DWO, pruned
 
         unassigned_variable = ua[0]
         values = [v.assigned_value() for v in self._scope]
@@ -181,7 +186,7 @@ class Constraint(abc.ABC):
                 unassigned_variable.prune(val)
                 pruned.append((unassigned_variable, val))
 
-        domain_wipeout = unassigned_variable.domain_size() == 0
+        domain_wipeout = DomainWipeout.DWO if unassigned_variable.domain_size() == 0 else DomainWipeout.NO_DWO
         return domain_wipeout, pruned
 
 

@@ -1,5 +1,6 @@
 from cp_solver.base import CSP
 from cp_solver.base import Variable
+from cp_solver.base import DomainWipeout
 from cp_solver import propagator
 import logging
 import typing
@@ -58,14 +59,14 @@ class BacktrackSearch:
         # initial propagation
         domain_wipeout, prunings = self._propagator(self._csp)
         # infeasible
-        if domain_wipeout:
+        if domain_wipeout == DomainWipeout.DWO:
             return None
 
         domain_wipeout = self._recurse()
 
         self._restore_pruning(prunings)
 
-        if domain_wipeout:
+        if domain_wipeout == DomainWipeout.DWO:
             return None
         return self._solution
 
@@ -78,7 +79,7 @@ class BacktrackSearch:
         if var is None:
             # reached a solution
             self._solution = [v.assigned_value() for v in self._csp.variables()]
-            return False
+            return DomainWipeout.NO_DWO
 
         for val in self._get_next_val(self._csp, var_i):
             var.assign(val)
@@ -92,4 +93,4 @@ class BacktrackSearch:
             var.unassign()
 
         # if there was no choice for any var to not have domain wipeout, our previous choices forced us to wipeout
-        return True
+        return DomainWipeout.DWO
