@@ -1,5 +1,6 @@
 from cp_solver import base
 from cp_solver import search
+from cp_solver import propagator
 
 
 def solve(size):

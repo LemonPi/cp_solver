@@ -1,6 +1,4 @@
-from cp_solver.base import CSP
-from cp_solver.base import Variable
-from cp_solver.base import DomainWipeout
+from cp_solver import base
 from cp_solver import propagator
 import logging
 import typing
@@ -30,9 +28,10 @@ def get_value_in_domain_order(csp, var_i):
 
 
 class BacktrackSearch:
-    def __init__(self, csp: CSP, prop=propagator.ForwardCheck(),
-                 select_next_variable: typing.Callable[[CSP], typing.Tuple[Variable, int]] = get_min_domain_variable,
-                 select_next_value: typing.Callable[[CSP, int], typing.Any] = get_value_in_domain_order):
+    def __init__(self, csp: base.CSP, prop=propagator.ForwardCheck(),
+                 select_next_variable: typing.Callable[
+                     [base.CSP], typing.Tuple[base.Variable, int]] = get_min_domain_variable,
+                 select_next_value: typing.Callable[[base.CSP, int], typing.Any] = get_value_in_domain_order):
 
         self._csp = csp
         self._propagator = prop
@@ -46,7 +45,7 @@ class BacktrackSearch:
                 v.unassign()
             v.restore_domain()
 
-    def _restore_pruning(self, prunings: typing.List[typing.Tuple[Variable, typing.Any]]):
+    def _restore_pruning(self, prunings: typing.List[typing.Tuple[base.Variable, typing.Any]]):
         for var, val in prunings:
             # TODO consider if we can store value indices instead since that'll be an order of magnitude improvement
             var.prune(val, unprune=True)
@@ -59,14 +58,14 @@ class BacktrackSearch:
         # initial propagation
         domain_wipeout, prunings = self._propagator(self._csp)
         # infeasible
-        if domain_wipeout == DomainWipeout.DWO:
+        if domain_wipeout == base.DomainWipeout.DWO:
             return None
 
         domain_wipeout = self._recurse()
 
         self._restore_pruning(prunings)
 
-        if domain_wipeout == DomainWipeout.DWO:
+        if domain_wipeout == base.DomainWipeout.DWO:
             return None
         return self._solution
 
@@ -79,7 +78,7 @@ class BacktrackSearch:
         if var is None:
             # reached a solution
             self._solution = [v.assigned_value() for v in self._csp.variables()]
-            return DomainWipeout.NO_DWO
+            return base.DomainWipeout.NO_DWO
 
         for val in self._get_next_val(self._csp, var_i):
             var.assign(val)
@@ -93,4 +92,4 @@ class BacktrackSearch:
             var.unassign()
 
         # if there was no choice for any var to not have domain wipeout, our previous choices forced us to wipeout
-        return DomainWipeout.DWO
+        return base.DomainWipeout.DWO

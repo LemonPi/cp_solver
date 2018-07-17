@@ -1,10 +1,10 @@
-from cp_solver.base import Variable
+from cp_solver import base
 import itertools
 
 
 def test_variable_domain_iteration():
     domain = list(range(10))
-    variable = Variable(domain)
+    variable = base.Variable(domain)
     assert len(domain) == variable.domain_size()
 
     domain_of_variable = []
@@ -24,7 +24,7 @@ def verify_domain_consistency(variable, domain):
 
 def test_variable_enumerated_iteration():
     domain = list(range(9, 0, -1))
-    variable = Variable(domain)
+    variable = base.Variable(domain)
 
     verify_domain_consistency(variable, domain)
 
@@ -32,7 +32,7 @@ def test_variable_enumerated_iteration():
 def test_nested_iteration():
     # should go through all value combinations
     domain = list(range(10))
-    variable = Variable(domain)
+    variable = base.Variable(domain)
 
     value_combos = set()
     for v in variable:
@@ -47,7 +47,7 @@ def test_nested_iteration():
 def test_variable_pruned_iteration():
     domain = list(range(10))
 
-    variable = Variable(domain)
+    variable = base.Variable(domain)
     variable.prune(5)
     assert len(domain) - 1 == variable.domain_size()
 
@@ -63,7 +63,7 @@ def test_variable_pruned_iteration():
 
 def test_variable_pruned_index_iteration():
     domain = list(range(10))
-    variable = Variable(domain)
+    variable = base.Variable(domain)
     variable.prune_at_index(5)
     assert len(domain) - 1 == variable.domain_size()
 
@@ -77,7 +77,7 @@ def test_variable_pruned_index_iteration():
 
 
 def test_variable_add_value():
-    variable = Variable()
+    variable = base.Variable()
     domain = "abcdefghijklmn"
     for c in domain:
         variable.add_value(c)
